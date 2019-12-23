@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 
 let app = express()
 
-mongoose.connect('mongodb://localhost:27017/broadway', { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
+mongoose.connect('mongodb://localhost:27017/library', { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
     console.log('conneted')
 }).catch(err => {
     console.log(err)

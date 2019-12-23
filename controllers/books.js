@@ -6,7 +6,7 @@ export const getAllBooks = (req, res) => {
     Books.find({}, (err, books) => {
         if (err) res.status(500).json(errMessageGet)
         res.status(200).json({ books })
-    }).populate('author')
+    }).populate('author').populate('category')
 }
 
 export const getBookById = (req, res) => {

@@ -209,7 +209,7 @@ var getAllBooks = function getAllBooks(req, res) {
     res.status(200).json({
       books: books
     });
-  }).populate('author');
+  }).populate('author').populate('category');
 };
 var getBookById = function getBookById(req, res) {
   _models_books__WEBPACK_IMPORTED_MODULE_1__["default"].findById(req.params.id, function (err, books) {
@@ -234,6 +234,62 @@ var deleteBookById = function deleteBookById(req, res) {
 };
 var updateBookById = function updateBookById(req, res) {
   _models_books__WEBPACK_IMPORTED_MODULE_1__["default"].findByIdAndUpdate(req.params.id, req.body, function (err, data) {
+    if (err) res.status(500).json(_config_constants__WEBPACK_IMPORTED_MODULE_0__["errMessageUpdate"]);
+    res.status(200).json(_config_constants__WEBPACK_IMPORTED_MODULE_0__["messageUpdate"]);
+  });
+};
+
+/***/ }),
+
+/***/ "./controllers/categories.js":
+/*!***********************************!*\
+  !*** ./controllers/categories.js ***!
+  \***********************************/
+/*! exports provided: getAllCategories, getCategoryById, postNewCategory, deleteCategoryById, updateCategoryById */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getAllCategories", function() { return getAllCategories; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getCategoryById", function() { return getCategoryById; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "postNewCategory", function() { return postNewCategory; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "deleteCategoryById", function() { return deleteCategoryById; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "updateCategoryById", function() { return updateCategoryById; });
+/* harmony import */ var _config_constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config/constants */ "./config/constants.js");
+/* harmony import */ var _models_categories__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../models/categories */ "./models/categories.js");
+
+
+var getAllCategories = function getAllCategories(req, res) {
+  _models_categories__WEBPACK_IMPORTED_MODULE_1__["default"].find({}, function (err, categories) {
+    if (err) res.status(500).json(_config_constants__WEBPACK_IMPORTED_MODULE_0__["errMessageGet"]);
+    res.status(200).json({
+      categories: categories
+    });
+  });
+};
+var getCategoryById = function getCategoryById(req, res) {
+  _models_categories__WEBPACK_IMPORTED_MODULE_1__["default"].findById(req.params.id, function (err, categories) {
+    if (err) res.status(500).json(_config_constants__WEBPACK_IMPORTED_MODULE_0__["errMessageGet"]);
+    res.status(200).json({
+      categories: categories
+    });
+  });
+};
+var postNewCategory = function postNewCategory(req, res) {
+  new _models_categories__WEBPACK_IMPORTED_MODULE_1__["default"](req.body).save(function (err, data) {
+    console.log(err);
+    if (err) res.status(500).json(_config_constants__WEBPACK_IMPORTED_MODULE_0__["errMessageSave"]);
+    res.status(201).json(_config_constants__WEBPACK_IMPORTED_MODULE_0__["messageSave"]);
+  });
+};
+var deleteCategoryById = function deleteCategoryById(req, res) {
+  _models_categories__WEBPACK_IMPORTED_MODULE_1__["default"].findByIdAndDelete(req.params.id, function (err, data) {
+    if (err) res.status(500).json(_config_constants__WEBPACK_IMPORTED_MODULE_0__["errMessageDelete"]);
+    res.status(200).json(_config_constants__WEBPACK_IMPORTED_MODULE_0__["messageDel"]);
+  });
+};
+var updateCategoryById = function updateCategoryById(req, res) {
+  _models_categories__WEBPACK_IMPORTED_MODULE_1__["default"].findByIdAndUpdate(req.params.id, req.body, function (err, data) {
     if (err) res.status(500).json(_config_constants__WEBPACK_IMPORTED_MODULE_0__["errMessageUpdate"]);
     res.status(200).json(_config_constants__WEBPACK_IMPORTED_MODULE_0__["messageUpdate"]);
   });
@@ -290,7 +346,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var app = express__WEBPACK_IMPORTED_MODULE_0___default()();
-mongoose__WEBPACK_IMPORTED_MODULE_2___default.a.connect('mongodb://localhost:27017/broadway', {
+mongoose__WEBPACK_IMPORTED_MODULE_2___default.a.connect('mongodb://localhost:27017/library', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(function () {
@@ -340,6 +396,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! mongoose */ "./node_modules/mongoose/index.js");
 /* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(mongoose__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _authors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./authors */ "./models/authors.js");
+/* harmony import */ var _categories__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./categories */ "./models/categories.js");
+
 
 
 var ObjectId = mongoose__WEBPACK_IMPORTED_MODULE_0__["Schema"].Types.ObjectId;
@@ -348,7 +406,10 @@ var books = new mongoose__WEBPACK_IMPORTED_MODULE_0__["Schema"]({
     type: String,
     required: true
   },
-  category: ObjectId,
+  category: {
+    type: ObjectId,
+    ref: _categories__WEBPACK_IMPORTED_MODULE_2__["default"]
+  },
   author: {
     type: ObjectId,
     ref: _authors__WEBPACK_IMPORTED_MODULE_1__["default"]
@@ -356,6 +417,28 @@ var books = new mongoose__WEBPACK_IMPORTED_MODULE_0__["Schema"]({
   publishedYear: Number
 });
 /* harmony default export */ __webpack_exports__["default"] = (mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.model('Book', books));
+
+/***/ }),
+
+/***/ "./models/categories.js":
+/*!******************************!*\
+  !*** ./models/categories.js ***!
+  \******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! mongoose */ "./node_modules/mongoose/index.js");
+/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(mongoose__WEBPACK_IMPORTED_MODULE_0__);
+
+var Categories = new mongoose__WEBPACK_IMPORTED_MODULE_0__["Schema"]({
+  title: {
+    type: String,
+    required: true
+  }
+});
+/* harmony default export */ __webpack_exports__["default"] = (mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.model('category', Categories));
 
 /***/ }),
 
@@ -15706,6 +15789,169 @@ function tryDecode(str, decode) {
 
 /***/ }),
 
+/***/ "./node_modules/debug/node_modules/ms/index.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/debug/node_modules/ms/index.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Helpers.
+ */
+
+var s = 1000;
+var m = s * 60;
+var h = m * 60;
+var d = h * 24;
+var y = d * 365.25;
+
+/**
+ * Parse or format the given `val`.
+ *
+ * Options:
+ *
+ *  - `long` verbose formatting [false]
+ *
+ * @param {String|Number} val
+ * @param {Object} [options]
+ * @throws {Error} throw an error if val is not a non-empty string or a number
+ * @return {String|Number}
+ * @api public
+ */
+
+module.exports = function(val, options) {
+  options = options || {};
+  var type = typeof val;
+  if (type === 'string' && val.length > 0) {
+    return parse(val);
+  } else if (type === 'number' && isNaN(val) === false) {
+    return options.long ? fmtLong(val) : fmtShort(val);
+  }
+  throw new Error(
+    'val is not a non-empty string or a valid number. val=' +
+      JSON.stringify(val)
+  );
+};
+
+/**
+ * Parse the given `str` and return milliseconds.
+ *
+ * @param {String} str
+ * @return {Number}
+ * @api private
+ */
+
+function parse(str) {
+  str = String(str);
+  if (str.length > 100) {
+    return;
+  }
+  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(
+    str
+  );
+  if (!match) {
+    return;
+  }
+  var n = parseFloat(match[1]);
+  var type = (match[2] || 'ms').toLowerCase();
+  switch (type) {
+    case 'years':
+    case 'year':
+    case 'yrs':
+    case 'yr':
+    case 'y':
+      return n * y;
+    case 'days':
+    case 'day':
+    case 'd':
+      return n * d;
+    case 'hours':
+    case 'hour':
+    case 'hrs':
+    case 'hr':
+    case 'h':
+      return n * h;
+    case 'minutes':
+    case 'minute':
+    case 'mins':
+    case 'min':
+    case 'm':
+      return n * m;
+    case 'seconds':
+    case 'second':
+    case 'secs':
+    case 'sec':
+    case 's':
+      return n * s;
+    case 'milliseconds':
+    case 'millisecond':
+    case 'msecs':
+    case 'msec':
+    case 'ms':
+      return n;
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Short format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function fmtShort(ms) {
+  if (ms >= d) {
+    return Math.round(ms / d) + 'd';
+  }
+  if (ms >= h) {
+    return Math.round(ms / h) + 'h';
+  }
+  if (ms >= m) {
+    return Math.round(ms / m) + 'm';
+  }
+  if (ms >= s) {
+    return Math.round(ms / s) + 's';
+  }
+  return ms + 'ms';
+}
+
+/**
+ * Long format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function fmtLong(ms) {
+  return plural(ms, d, 'day') ||
+    plural(ms, h, 'hour') ||
+    plural(ms, m, 'minute') ||
+    plural(ms, s, 'second') ||
+    ms + ' ms';
+}
+
+/**
+ * Pluralization helper.
+ */
+
+function plural(ms, n, name) {
+  if (ms < n) {
+    return;
+  }
+  if (ms < n * 1.5) {
+    return Math.floor(ms / n) + ' ' + name;
+  }
+  return Math.ceil(ms / n) + ' ' + name + 's';
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/debug/src/browser.js":
 /*!*******************************************!*\
   !*** ./node_modules/debug/src/browser.js ***!
@@ -15922,7 +16168,7 @@ exports.coerce = coerce;
 exports.disable = disable;
 exports.enable = enable;
 exports.enabled = enabled;
-exports.humanize = __webpack_require__(/*! ms */ "./node_modules/ms/index.js");
+exports.humanize = __webpack_require__(/*! ms */ "./node_modules/debug/node_modules/ms/index.js");
 
 /**
  * The currently active debug mode names, and names to skip.
@@ -106565,7 +106811,7 @@ const cloneRegExp = __webpack_require__(/*! regexp-clone */ "./node_modules/rege
 const get = __webpack_require__(/*! ./helpers/get */ "./node_modules/mongoose/lib/helpers/get.js");
 const sliced = __webpack_require__(/*! sliced */ "./node_modules/sliced/index.js");
 const mpath = __webpack_require__(/*! mpath */ "./node_modules/mpath/index.js");
-const ms = __webpack_require__(/*! ms */ "./node_modules/mongoose/node_modules/ms/index.js");
+const ms = __webpack_require__(/*! ms */ "./node_modules/ms/index.js");
 const symbols = __webpack_require__(/*! ./helpers/symbols */ "./node_modules/mongoose/lib/helpers/symbols.js");
 const Buffer = __webpack_require__(/*! safe-buffer */ "./node_modules/mongoose/node_modules/safe-buffer/index.js").Buffer;
 
@@ -107873,179 +108119,6 @@ VirtualType.prototype.applySetters = function(value, doc) {
  */
 
 module.exports = VirtualType;
-
-
-/***/ }),
-
-/***/ "./node_modules/mongoose/node_modules/ms/index.js":
-/*!********************************************************!*\
-  !*** ./node_modules/mongoose/node_modules/ms/index.js ***!
-  \********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-/**
- * Helpers.
- */
-
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var w = d * 7;
-var y = d * 365.25;
-
-/**
- * Parse or format the given `val`.
- *
- * Options:
- *
- *  - `long` verbose formatting [false]
- *
- * @param {String|Number} val
- * @param {Object} [options]
- * @throws {Error} throw an error if val is not a non-empty string or a number
- * @return {String|Number}
- * @api public
- */
-
-module.exports = function(val, options) {
-  options = options || {};
-  var type = typeof val;
-  if (type === 'string' && val.length > 0) {
-    return parse(val);
-  } else if (type === 'number' && isFinite(val)) {
-    return options.long ? fmtLong(val) : fmtShort(val);
-  }
-  throw new Error(
-    'val is not a non-empty string or a valid number. val=' +
-      JSON.stringify(val)
-  );
-};
-
-/**
- * Parse the given `str` and return milliseconds.
- *
- * @param {String} str
- * @return {Number}
- * @api private
- */
-
-function parse(str) {
-  str = String(str);
-  if (str.length > 100) {
-    return;
-  }
-  var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
-    str
-  );
-  if (!match) {
-    return;
-  }
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
-  switch (type) {
-    case 'years':
-    case 'year':
-    case 'yrs':
-    case 'yr':
-    case 'y':
-      return n * y;
-    case 'weeks':
-    case 'week':
-    case 'w':
-      return n * w;
-    case 'days':
-    case 'day':
-    case 'd':
-      return n * d;
-    case 'hours':
-    case 'hour':
-    case 'hrs':
-    case 'hr':
-    case 'h':
-      return n * h;
-    case 'minutes':
-    case 'minute':
-    case 'mins':
-    case 'min':
-    case 'm':
-      return n * m;
-    case 'seconds':
-    case 'second':
-    case 'secs':
-    case 'sec':
-    case 's':
-      return n * s;
-    case 'milliseconds':
-    case 'millisecond':
-    case 'msecs':
-    case 'msec':
-    case 'ms':
-      return n;
-    default:
-      return undefined;
-  }
-}
-
-/**
- * Short format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtShort(ms) {
-  var msAbs = Math.abs(ms);
-  if (msAbs >= d) {
-    return Math.round(ms / d) + 'd';
-  }
-  if (msAbs >= h) {
-    return Math.round(ms / h) + 'h';
-  }
-  if (msAbs >= m) {
-    return Math.round(ms / m) + 'm';
-  }
-  if (msAbs >= s) {
-    return Math.round(ms / s) + 's';
-  }
-  return ms + 'ms';
-}
-
-/**
- * Long format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtLong(ms) {
-  var msAbs = Math.abs(ms);
-  if (msAbs >= d) {
-    return plural(ms, msAbs, d, 'day');
-  }
-  if (msAbs >= h) {
-    return plural(ms, msAbs, h, 'hour');
-  }
-  if (msAbs >= m) {
-    return plural(ms, msAbs, m, 'minute');
-  }
-  if (msAbs >= s) {
-    return plural(ms, msAbs, s, 'second');
-  }
-  return ms + ' ms';
-}
-
-/**
- * Pluralization helper.
- */
-
-function plural(ms, msAbs, n, name) {
-  var isPlural = msAbs >= n * 1.5;
-  return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
-}
 
 
 /***/ }),
@@ -112703,7 +112776,7 @@ exports.coerce = coerce;
 exports.disable = disable;
 exports.enable = enable;
 exports.enabled = enabled;
-exports.humanize = __webpack_require__(/*! ms */ "./node_modules/ms/index.js");
+exports.humanize = __webpack_require__(/*! ms */ "./node_modules/mquery/node_modules/ms/index.js");
 
 /**
  * Active `debug` instances.
@@ -113137,83 +113210,10 @@ exports.enable(load());
 
 /***/ }),
 
-/***/ "./node_modules/mquery/node_modules/safe-buffer/index.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/mquery/node_modules/safe-buffer/index.js ***!
-  \***************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* eslint-disable node/no-deprecated-api */
-var buffer = __webpack_require__(/*! buffer */ "buffer")
-var Buffer = buffer.Buffer
-
-// alternative to using Object.keys for old browsers
-function copyProps (src, dst) {
-  for (var key in src) {
-    dst[key] = src[key]
-  }
-}
-if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow) {
-  module.exports = buffer
-} else {
-  // Copy properties from require('buffer')
-  copyProps(buffer, exports)
-  exports.Buffer = SafeBuffer
-}
-
-function SafeBuffer (arg, encodingOrOffset, length) {
-  return Buffer(arg, encodingOrOffset, length)
-}
-
-// Copy static methods from Buffer
-copyProps(Buffer, SafeBuffer)
-
-SafeBuffer.from = function (arg, encodingOrOffset, length) {
-  if (typeof arg === 'number') {
-    throw new TypeError('Argument must not be a number')
-  }
-  return Buffer(arg, encodingOrOffset, length)
-}
-
-SafeBuffer.alloc = function (size, fill, encoding) {
-  if (typeof size !== 'number') {
-    throw new TypeError('Argument must be a number')
-  }
-  var buf = Buffer(size)
-  if (fill !== undefined) {
-    if (typeof encoding === 'string') {
-      buf.fill(fill, encoding)
-    } else {
-      buf.fill(fill)
-    }
-  } else {
-    buf.fill(0)
-  }
-  return buf
-}
-
-SafeBuffer.allocUnsafe = function (size) {
-  if (typeof size !== 'number') {
-    throw new TypeError('Argument must be a number')
-  }
-  return Buffer(size)
-}
-
-SafeBuffer.allocUnsafeSlow = function (size) {
-  if (typeof size !== 'number') {
-    throw new TypeError('Argument must be a number')
-  }
-  return buffer.SlowBuffer(size)
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/ms/index.js":
-/*!**********************************!*\
-  !*** ./node_modules/ms/index.js ***!
-  \**********************************/
+/***/ "./node_modules/mquery/node_modules/ms/index.js":
+/*!******************************************************!*\
+  !*** ./node_modules/mquery/node_modules/ms/index.js ***!
+  \******************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -113368,6 +113368,252 @@ function plural(ms, n, name) {
     return Math.floor(ms / n) + ' ' + name;
   }
   return Math.ceil(ms / n) + ' ' + name + 's';
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/mquery/node_modules/safe-buffer/index.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/mquery/node_modules/safe-buffer/index.js ***!
+  \***************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* eslint-disable node/no-deprecated-api */
+var buffer = __webpack_require__(/*! buffer */ "buffer")
+var Buffer = buffer.Buffer
+
+// alternative to using Object.keys for old browsers
+function copyProps (src, dst) {
+  for (var key in src) {
+    dst[key] = src[key]
+  }
+}
+if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow) {
+  module.exports = buffer
+} else {
+  // Copy properties from require('buffer')
+  copyProps(buffer, exports)
+  exports.Buffer = SafeBuffer
+}
+
+function SafeBuffer (arg, encodingOrOffset, length) {
+  return Buffer(arg, encodingOrOffset, length)
+}
+
+// Copy static methods from Buffer
+copyProps(Buffer, SafeBuffer)
+
+SafeBuffer.from = function (arg, encodingOrOffset, length) {
+  if (typeof arg === 'number') {
+    throw new TypeError('Argument must not be a number')
+  }
+  return Buffer(arg, encodingOrOffset, length)
+}
+
+SafeBuffer.alloc = function (size, fill, encoding) {
+  if (typeof size !== 'number') {
+    throw new TypeError('Argument must be a number')
+  }
+  var buf = Buffer(size)
+  if (fill !== undefined) {
+    if (typeof encoding === 'string') {
+      buf.fill(fill, encoding)
+    } else {
+      buf.fill(fill)
+    }
+  } else {
+    buf.fill(0)
+  }
+  return buf
+}
+
+SafeBuffer.allocUnsafe = function (size) {
+  if (typeof size !== 'number') {
+    throw new TypeError('Argument must be a number')
+  }
+  return Buffer(size)
+}
+
+SafeBuffer.allocUnsafeSlow = function (size) {
+  if (typeof size !== 'number') {
+    throw new TypeError('Argument must be a number')
+  }
+  return buffer.SlowBuffer(size)
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/ms/index.js":
+/*!**********************************!*\
+  !*** ./node_modules/ms/index.js ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Helpers.
+ */
+
+var s = 1000;
+var m = s * 60;
+var h = m * 60;
+var d = h * 24;
+var w = d * 7;
+var y = d * 365.25;
+
+/**
+ * Parse or format the given `val`.
+ *
+ * Options:
+ *
+ *  - `long` verbose formatting [false]
+ *
+ * @param {String|Number} val
+ * @param {Object} [options]
+ * @throws {Error} throw an error if val is not a non-empty string or a number
+ * @return {String|Number}
+ * @api public
+ */
+
+module.exports = function(val, options) {
+  options = options || {};
+  var type = typeof val;
+  if (type === 'string' && val.length > 0) {
+    return parse(val);
+  } else if (type === 'number' && isFinite(val)) {
+    return options.long ? fmtLong(val) : fmtShort(val);
+  }
+  throw new Error(
+    'val is not a non-empty string or a valid number. val=' +
+      JSON.stringify(val)
+  );
+};
+
+/**
+ * Parse the given `str` and return milliseconds.
+ *
+ * @param {String} str
+ * @return {Number}
+ * @api private
+ */
+
+function parse(str) {
+  str = String(str);
+  if (str.length > 100) {
+    return;
+  }
+  var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
+    str
+  );
+  if (!match) {
+    return;
+  }
+  var n = parseFloat(match[1]);
+  var type = (match[2] || 'ms').toLowerCase();
+  switch (type) {
+    case 'years':
+    case 'year':
+    case 'yrs':
+    case 'yr':
+    case 'y':
+      return n * y;
+    case 'weeks':
+    case 'week':
+    case 'w':
+      return n * w;
+    case 'days':
+    case 'day':
+    case 'd':
+      return n * d;
+    case 'hours':
+    case 'hour':
+    case 'hrs':
+    case 'hr':
+    case 'h':
+      return n * h;
+    case 'minutes':
+    case 'minute':
+    case 'mins':
+    case 'min':
+    case 'm':
+      return n * m;
+    case 'seconds':
+    case 'second':
+    case 'secs':
+    case 'sec':
+    case 's':
+      return n * s;
+    case 'milliseconds':
+    case 'millisecond':
+    case 'msecs':
+    case 'msec':
+    case 'ms':
+      return n;
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Short format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function fmtShort(ms) {
+  var msAbs = Math.abs(ms);
+  if (msAbs >= d) {
+    return Math.round(ms / d) + 'd';
+  }
+  if (msAbs >= h) {
+    return Math.round(ms / h) + 'h';
+  }
+  if (msAbs >= m) {
+    return Math.round(ms / m) + 'm';
+  }
+  if (msAbs >= s) {
+    return Math.round(ms / s) + 's';
+  }
+  return ms + 'ms';
+}
+
+/**
+ * Long format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function fmtLong(ms) {
+  var msAbs = Math.abs(ms);
+  if (msAbs >= d) {
+    return plural(ms, msAbs, d, 'day');
+  }
+  if (msAbs >= h) {
+    return plural(ms, msAbs, h, 'hour');
+  }
+  if (msAbs >= m) {
+    return plural(ms, msAbs, m, 'minute');
+  }
+  if (msAbs >= s) {
+    return plural(ms, msAbs, s, 'second');
+  }
+  return ms + ' ms';
+}
+
+/**
+ * Pluralization helper.
+ */
+
+function plural(ms, msAbs, n, name) {
+  var isPlural = msAbs >= n * 1.5;
+  return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
 }
 
 
@@ -121363,28 +121609,21 @@ function status (code) {
 const os = __webpack_require__(/*! os */ "os");
 const hasFlag = __webpack_require__(/*! has-flag */ "./node_modules/has-flag/index.js");
 
-const {env} = process;
+const env = process.env;
 
 let forceColor;
 if (hasFlag('no-color') ||
 	hasFlag('no-colors') ||
-	hasFlag('color=false') ||
-	hasFlag('color=never')) {
-	forceColor = 0;
+	hasFlag('color=false')) {
+	forceColor = false;
 } else if (hasFlag('color') ||
 	hasFlag('colors') ||
 	hasFlag('color=true') ||
 	hasFlag('color=always')) {
-	forceColor = 1;
+	forceColor = true;
 }
 if ('FORCE_COLOR' in env) {
-	if (env.FORCE_COLOR === true || env.FORCE_COLOR === 'true') {
-		forceColor = 1;
-	} else if (env.FORCE_COLOR === false || env.FORCE_COLOR === 'false') {
-		forceColor = 0;
-	} else {
-		forceColor = env.FORCE_COLOR.length === 0 ? 1 : Math.min(parseInt(env.FORCE_COLOR, 10), 3);
-	}
+	forceColor = env.FORCE_COLOR.length === 0 || parseInt(env.FORCE_COLOR, 10) !== 0;
 }
 
 function translateLevel(level) {
@@ -121401,7 +121640,7 @@ function translateLevel(level) {
 }
 
 function supportsColor(stream) {
-	if (forceColor === 0) {
+	if (forceColor === false) {
 		return 0;
 	}
 
@@ -121415,15 +121654,11 @@ function supportsColor(stream) {
 		return 2;
 	}
 
-	if (stream && !stream.isTTY && forceColor === undefined) {
+	if (stream && !stream.isTTY && forceColor !== true) {
 		return 0;
 	}
 
-	const min = forceColor || 0;
-
-	if (env.TERM === 'dumb') {
-		return min;
-	}
+	const min = forceColor ? 1 : 0;
 
 	if (process.platform === 'win32') {
 		// Node.js 7.5.0 is the first version of Node.js to include a patch to
@@ -121482,6 +121717,10 @@ function supportsColor(stream) {
 
 	if ('COLORTERM' in env) {
 		return 1;
+	}
+
+	if (env.TERM === 'dumb') {
+		return min;
 	}
 
 	return min;
@@ -122171,6 +122410,27 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./routes/categories.js":
+/*!******************************!*\
+  !*** ./routes/categories.js ***!
+  \******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _controllers_categories__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../controllers/categories */ "./controllers/categories.js");
+
+/* harmony default export */ __webpack_exports__["default"] = (function (app) {
+  app.get('/categories', _controllers_categories__WEBPACK_IMPORTED_MODULE_0__["getAllCategories"]);
+  app.get('/categories/:id', _controllers_categories__WEBPACK_IMPORTED_MODULE_0__["getCategoryById"]);
+  app.post('/categories', _controllers_categories__WEBPACK_IMPORTED_MODULE_0__["postNewCategory"]);
+  app["delete"]('/categories/:id', _controllers_categories__WEBPACK_IMPORTED_MODULE_0__["deleteCategoryById"]);
+  app.put('/categories/:id', _controllers_categories__WEBPACK_IMPORTED_MODULE_0__["updateCategoryById"]);
+});
+
+/***/ }),
+
 /***/ "./routes/index.js":
 /*!*************************!*\
   !*** ./routes/index.js ***!
@@ -122183,6 +122443,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _controllers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../controllers */ "./controllers/index.js");
 /* harmony import */ var _books__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./books */ "./routes/books.js");
 /* harmony import */ var _authors__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./authors */ "./routes/authors.js");
+/* harmony import */ var _categories__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./categories */ "./routes/categories.js");
+
 
 
 
@@ -122190,6 +122452,7 @@ __webpack_require__.r(__webpack_exports__);
   app.get('/', _controllers__WEBPACK_IMPORTED_MODULE_0__["getHomePage"]);
   Object(_books__WEBPACK_IMPORTED_MODULE_1__["default"])(app);
   Object(_authors__WEBPACK_IMPORTED_MODULE_2__["default"])(app);
+  Object(_categories__WEBPACK_IMPORTED_MODULE_3__["default"])(app);
   app.get("*", _controllers__WEBPACK_IMPORTED_MODULE_0__["route404"]);
 });
 
